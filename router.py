@@ -4,7 +4,7 @@ from typing import Any, Dict
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse, RedirectResponse
 
-from .registry import get_default_registry
+from registry import get_default_registry
 
 
 def create_mcp_router(
