@@ -177,42 +177,6 @@ redis_client.setex(f"oauth_redirect:{state}", 600, redirect_uri)
 
 This approach prevents IdP from needing to know or whitelist every client callback URI while maintaining the desired OAuth flow.
 
-## Integration with Tiny MCP
-
-Once OAuth is implemented, your Tiny MCP tools can access user context:
-
-```python
-from tiny_mcp import mcp_tool
-from fastapi import Request
-
-@mcp_tool(description="Get user-specific data")
-async def get_user_data(request: Request) -> dict:
-    """Get data specific to the authenticated user"""
-    # Access authenticated user (set by auth middleware)
-    user = request.state.user
-
-    return {
-        "user_id": user["user_id"],
-        "email": user["email"],
-        "name": user["name"],
-        "message": f"Hello {user['name']}!"
-    }
-
-# Create MCP router with custom prefix if needed
-mcp_router = create_mcp_router(
-    name="SpellVault MCP",
-    version="0.1.0",
-    prefix="/mcp"  # Configurable endpoint
-)
-
-# Add all routers to FastAPI
-app.include_router(discovery_router)
-app.include_router(auth_router)
-app.include_router(mcp_router)
-```
-
-This implementation provides a complete, production-ready OAuth 2.1 PKCE integration for Tiny MCP that works seamlessly with FastAPI Server's existing IdP OIDC infrastructure!
-
 
 
 ## Sample Implementation of various endpoints and functions for Integration with existing OAuth
