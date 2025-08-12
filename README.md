@@ -26,21 +26,10 @@ app.include_router(create_mcp_router(name="My App"))
 app.include_router(create_mcp_router(name="My App", prefix="/my-mcp"))
 ```
 
-## Installation
-
-```bash
-git clone https://github.com/grab/tinymcp.git
-cd tinymcp
-pip install -e .
-```
-
 ## Quick Demo
+Once you have this repo cloned, from root, run the following (install the missing dev dependencies as required)
 
 ```bash
-# Clone and run example
-git clone https://github.com/grab/tinymcp.git
-cd tinymcp
-
 uv run python docs/sample_server/simple_fastapi_server.py
 ```
 
