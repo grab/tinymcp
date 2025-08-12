@@ -1,4 +1,4 @@
-```python:api/spellvault_mcp/auth.py
+```python:auth.py
 import secrets
 import time
 import base64
@@ -314,7 +314,7 @@ async def oauth_token_endpoint(request: Request) -> Dict[str, Any]:
 
 Now here are the key supporting functions that make this OAuth implementation work:
 
-```python:samples/jwt_token_generation.py
+```python:jwt_token_generation.py
 # Sample JWT Token Generation Function
 # This shows how your-server creates its own access tokens after validating with IDP provider
 
@@ -372,7 +372,7 @@ def _generate_jwt_token(
     return tokenizer.encode(user_ctx.model_dump(), expire_date)
 ```
 
-```python:samples/auth_provider_interface.py
+```python:auth_provider_interface.py
 # Sample IDP Provider Interface
 # This shows how your-server communicates with identity providers
 
@@ -461,7 +461,7 @@ class IDPProviderAuth(AuthIssuer):
         )
 ```
 
-```python:samples/request_authorization_middleware.py
+```python:request_authorization_middleware.py
 # Sample Request Authorization Middleware
 # This shows how your-server validates tokens in incoming requests
 

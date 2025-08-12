@@ -1,9 +1,0 @@
-# Development dependencies for TinyMCP
-fastapi>=0.68.0
-pytest>=6.0
-pytest-asyncio
-httpx  # For testing FastAPI apps
-black  # Code formatting
-isort  # Import sorting
-flake8  # Linting
-mypy  # Type checking

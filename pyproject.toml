@@ -30,22 +30,8 @@ classifiers = [
 keywords = ["mcp", "fastapi", "model-context-protocol", "tools", "api"]
 dependencies = [
     "fastapi>=0.68.0",
-    "httpx>=0.28.1",
-    "pytest>=8.3.5",
-    "pytest-asyncio>=0.24.0",
 ]
 requires-python = ">=3.8"
-
-[project.optional-dependencies]
-dev = [
-    "pytest>=6.0",
-    "pytest-asyncio",
-    "httpx",
-    "black",
-    "isort",
-    "flake8",
-    "mypy",
-]
 
 [project.urls]
 Homepage = "https://github.com/grab/tinymcp"
@@ -54,7 +40,7 @@ Repository = "https://github.com/grab/tinymcp"
 "Bug Tracker" = "https://github.com/grab/tinymcp/issues"
 
 [tool.hatch.version]
-path = "__init__.py"
+path = "tinymcp/__init__.py"
 
 [tool.hatch.build.targets.sdist]
 include = [
@@ -64,25 +50,4 @@ include = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["."]
-
-[tool.black]
-line-length = 88
-target-version = ['py38']
-
-[tool.isort]
-profile = "black"
-multi_line_output = 3
-
-[tool.mypy]
-python_version = "3.8"
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = true
-
-[tool.pytest.ini_options]
-asyncio_default_fixture_loop_scope = "function"
-testpaths = ["tests"]
-python_files = ["test_*.py"]
-python_classes = ["Test*"]
-python_functions = ["test_*"]
+packages = ["tinymcp"]
