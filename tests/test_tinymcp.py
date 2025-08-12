@@ -93,7 +93,7 @@ class TestTinyMCP:
         assert json.loads(result["content"][0]["text"]) == 8
 
     def test_structured_output(self):
-        """Test structured output support (MCP 2025-06-18 feature)."""
+        """Test structured output support."""
         response = self.client.post("/mcp", json={
             "jsonrpc": "2.0",
             "id": 5,

@@ -62,9 +62,7 @@ def create_mcp_router(
 
                 tool_result = await registry.call_tool(tool_name, arguments)
 
-                # Support structured output (new in 2025-06-18)
                 if isinstance(tool_result, dict) and "structured" in tool_result:
-                    # Tool returned structured output
                     result = {
                         "content": tool_result.get(
                             "content",
@@ -75,7 +73,6 @@ def create_mcp_router(
                     if "structured" in tool_result:
                         result["structured"] = tool_result["structured"]
                 else:
-                    # Legacy format - wrap result as text content
                     result = {
                         "content": [{"type": "text", "text": json.dumps(tool_result)}],
                         "isError": False,
@@ -98,16 +95,9 @@ def create_mcp_router(
     async def mcp_endpoint(request: Request) -> JSONResponse:
         """
         Main MCP endpoint - handles JSON-RPC messages.
-
-        This endpoint processes MCP protocol requests. User authentication
-        should be handled by middleware before this endpoint is reached.
-        Access authenticated user via: request.state.user (if auth middleware is used)
-
-        Note: JSON-RPC batching has been removed as per MCP 2025-06-18 specification.
         """
         body = await request.json()
 
-        # Validate MCP-Protocol-Version header (required in 2025-06-18)
         protocol_header = request.headers.get("MCP-Protocol-Version")
         if protocol_header and protocol_header != "2025-06-18":
             return JSONResponse(
@@ -115,7 +105,6 @@ def create_mcp_router(
                 status_code=400,
             )
 
-        # Handle single JSON-RPC request only (batching removed in 2025-06-18)
         if isinstance(body, dict) and "method" in body:
             response = await handle_message(body)
             return JSONResponse(response)

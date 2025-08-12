@@ -1,6 +1,6 @@
 # TinyMCP
 
-A lightweight MCP router for FastAPI. Supports MCP 2025-06-18 specification.
+A lightweight MCP router for FastAPI.
 
 ## Quick Start
 
@@ -12,7 +12,6 @@ def get_time() -> str:
     from datetime import datetime
     return datetime.now().isoformat()
 
-# Structured output (new in 2025-06-18)
 @mcp_tool(description="Get user data with structured output")
 def get_user_data():
     return {
