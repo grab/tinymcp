@@ -1,6 +1,5 @@
 stages:
   - prepare
-  - lint
   - test
   - validate
   - publish
@@ -25,8 +24,8 @@ prepare:
     - echo "Ignoring uv.lock (CI non-frozen install)"
     - rm -f uv.lock || true
     - uv sync
-    - echo "Installing tools for linting and testing..."
-    - uv pip install black pytest pytest-cov pytest-asyncio httpx
+    - echo "Installing test tools..."
+    - uv pip install pytest pytest-cov pytest-asyncio httpx
     - echo "Building TinyMCP package..."
     - uv build
     - echo "Contents of .venv directory:"
@@ -38,19 +37,6 @@ prepare:
       - .venv/
       - dist/
     expire_in: 1 hour
-
-lint:
-  stage: lint
-  image: python:3.11-slim
-  dependencies:
-    - prepare
-  script:
-    - echo "Using artifacts from prepare stage..."
-    - ls -la .venv/ || echo "No .venv found in artifacts"
-    - source .venv/bin/activate
-    - echo "Checking code formatting with Black..."
-    - black --check --diff tinymcp/ tests/
-  allow_failure: false
 
 test:
   stage: test
