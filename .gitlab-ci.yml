@@ -1,0 +1,118 @@
+stages:
+  - prepare
+  - lint
+  - test
+  - validate
+  - publish
+
+variables:
+  UV_VERSION: "0.5.0"
+  CI_PYPI_REGISTRY: "$CI_API_V4_URL/projects/$CI_PROJECT_ID/packages/pypi"
+  UV_NO_CACHE: "1"
+  UV_CACHE_DIR: "$CI_PROJECT_DIR/.cache/uv"
+
+before_script:
+  - python -V
+  - python -m pip install --no-cache-dir uv==${UV_VERSION}
+  - uv --version
+
+prepare:
+  stage: prepare
+  image: python:3.11-slim
+  script:
+    - echo "Installing dependencies and building package..."
+    - uv sync
+    - echo "Installing tools for linting and testing..."
+    - uv pip install black pytest pytest-cov pytest-asyncio
+    - echo "Building TinyMCP package..."
+    - uv build
+    - echo "Contents of .venv directory:"
+    - ls -la .venv/ || true
+    - echo "Contents of dist directory:"
+    - ls -la dist/
+  artifacts:
+    paths:
+      - .venv/
+      - dist/
+    expire_in: 1 hour
+
+lint:
+  stage: lint
+  image: python:3.11-slim
+  dependencies:
+    - prepare
+  script:
+    - echo "Using artifacts from prepare stage..."
+    - ls -la .venv/ || echo "No .venv found in artifacts"
+    - source .venv/bin/activate
+    - echo "Checking code formatting with Black..."
+    - black --check --diff tinymcp/ tests/
+  allow_failure: false
+
+test:
+  stage: test
+  image: python:3.11-slim
+  dependencies:
+    - prepare
+  script:
+    - echo "Using artifacts from prepare stage..."
+    - ls -la .venv/ || echo "No .venv found in artifacts"
+    - source .venv/bin/activate
+    - echo "Running unit tests with coverage..."
+    - pytest tests/ -v --junit-xml=junit.xml --cov=tinymcp --cov-report=xml --cov-report=html
+  coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
+  artifacts:
+    when: always
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
+      junit: junit.xml
+    paths:
+      - htmlcov/
+      - coverage.xml
+    expire_in: 30 days
+
+validate:
+  stage: validate
+  image: python:3.11-slim
+  dependencies:
+    - prepare
+  script:
+    - echo "Validating package installation..."
+    - ls -la dist/
+    - WHEEL_FILE=$(ls dist/*.whl | head -1)
+    - echo "Installing $WHEEL_FILE"
+    - pip install "$WHEEL_FILE"
+    - echo "Testing basic imports..."
+    - python -c "import tinymcp; print('tinymcp import ok')"
+    - python -c "from tinymcp import create_mcp_router, mcp_tool; print('router + decorator import ok')"
+    - python -c "from tinymcp.registry import ToolRegistry; print('ToolRegistry import ok')"
+    - python -c "from tinymcp.router import create_mcp_router as _c; print('router module import ok')"
+
+publish:
+  stage: publish
+  image: python:3.11-slim
+  dependencies:
+    - prepare
+  script:
+    - python -m pip install --no-cache-dir twine
+    - echo "Publishing package to GitLab registry..."
+    - ls -la dist/
+    - |
+      set +e
+      output=$(python -m twine upload --repository-url "$CI_PYPI_REGISTRY" --username gitlab-ci-token --password "$CI_JOB_TOKEN" dist/* 2>&1)
+      exit_code=$?
+      echo "$output"
+      if [ $exit_code -eq 0 ]; then
+        echo "✅ Package published successfully"
+        exit 0
+      elif echo "$output" | grep -qi "already exists\|already taken\|409\|Conflict"; then
+        echo "⚠️  WARNING: Package version already exists in registry. Skipping publish."
+        exit 0
+      else
+        echo "❌ Twine upload failed with unexpected error"
+        exit $exit_code
+      fi
+  only:
+    - tags
