@@ -5,6 +5,7 @@ stages:
   - validate
   - publish
 
+
 variables:
   UV_VERSION: "0.5.0"
   CI_PYPI_REGISTRY: "$CI_API_V4_URL/projects/$CI_PROJECT_ID/packages/pypi"
