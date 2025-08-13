@@ -22,9 +22,11 @@ prepare:
   image: python:3.11-slim
   script:
     - echo "Installing dependencies and building package..."
+    - echo "Ignoring uv.lock (CI non-frozen install)"
+    - rm -f uv.lock || true
     - uv sync
     - echo "Installing tools for linting and testing..."
-    - uv pip install black pytest pytest-cov pytest-asyncio
+    - uv pip install black pytest pytest-cov pytest-asyncio httpx
     - echo "Building TinyMCP package..."
     - uv build
     - echo "Contents of .venv directory:"
