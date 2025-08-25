@@ -2,40 +2,6 @@
 
 A lightweight MCP router for FastAPI.
 
-## Installation
-### Install directly:
-```bash
-uv pip install --no-cache \
-  --index-url "https://gitlab.myteksi.net/api/v4/projects/34156/packages/pypi/simple/" \
-  "tinymcp"
-```
-
-
-### Adding as a dependency in Python Projects:
-- For Poetry projects:
-```toml
-[tool.poetry.dependencies]
-tinymcp = {version = "^0.1.0", source = "grab-tinymcp"}
-
-[[tool.poetry.source]]
-name = "grab-tinymcp"
-url = "https://gitlab.myteksi.net/api/v4/projects/34156/packages/pypi/simple"
-priority = "supplemental"
-```
-
-- For UV projects:
-```toml
-[project]
-dependencies = ["tinymcp>=0.1.0"]
-
-[tool.uv.index]
-grab-tinymcp = { url = "https://gitlab.myteksi.net/api/v4/projects/34156/packages/pypi/simple" }
-
-[tool.uv.sources]
-tinymcp = { index = "grab-tinymcp" }
-```
-
-
 ## Quick Start
 
 ```python
