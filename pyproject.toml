@@ -13,6 +13,7 @@ authors = [
 ]
 maintainers = [
     {name = "Md Riyadh", email = "riyadh.sharif@grabtaxi.com"},
+    {name = "Felix Lie", email = "felix.lie@grabtaxi.com"},
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
