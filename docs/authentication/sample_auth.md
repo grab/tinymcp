@@ -50,7 +50,7 @@ mcp_discovery_router = APIRouter()
 @mcp_discovery_router.get("/.well-known/oauth-authorization-server")
 async def oauth_authorization_server_metadata() -> Dict[str, Any]:
     """
-    OAuth 2.0 Authorization Server Metadata (RFC 8414)
+    OAuth 2.0 Authorization Server Metadata 
     Provides discovery information about the authorization server's endpoints and capabilities
     """
     base_url = config.get_string(
@@ -74,7 +74,7 @@ async def oauth_authorization_server_metadata() -> Dict[str, Any]:
 @mcp_discovery_router.get("/.well-known/oauth-protected-resource")
 async def oauth_protected_resource() -> Dict[str, Any]:
     """
-    OAuth 2.0 Protected Resource Metadata (RFC 8414)
+    OAuth 2.0 Protected Resource Metadata 
     Describes the protected resource and its authorization requirements
     """
     base_url = config.get_string(
@@ -92,13 +92,13 @@ async def oauth_protected_resource() -> Dict[str, Any]:
 @mcp_auth_router.post("/register")
 async def oauth_client_registration(request: Request) -> Dict[str, Any]:
     """
-    OAuth 2.0 Dynamic Client Registration (RFC 7591)
+    OAuth 2.0 Dynamic Client Registration 
     Allows clients to register dynamically and obtain client credentials
     """
     try:
         body = await request.json()
 
-        # Validate required parameters per RFC 7591
+        # Validate required parameters  
         if "redirect_uris" not in body or not body["redirect_uris"]:
             raise HTTPException(status_code=400, detail="redirect_uris required")
 
@@ -134,20 +134,18 @@ def oauth_authorize_endpoint(
     resource: str = None,
 ) -> RedirectResponse:
     """
-    OAuth 2.0 Authorization Endpoint (RFC 6749 Section 3.1)
+    OAuth 2.0 Authorization Endpoint
     Handles authorization requests from MCP clients by redirecting to IDP provider
 
     Security Features:
-    - CSRF protection via state parameter
-    - PKCE support for public clients (RFC 7636)
-    - Parameter validation per OAuth 2.0 spec
+    - PKCE support for public clients 
+    - Parameter validation 
     """
     try:
         # Validate OAuth 2.0 parameters
         if response_type != "code":
             raise HTTPException(status_code=400, detail="unsupported_response_type")
 
-        # CSRF protection: Generate state parameter if not provided
         if not state:
             state = secrets.token_urlsafe(32)
 
@@ -162,7 +160,7 @@ def oauth_authorize_endpoint(
         if not idp_provider_url or not idp_provider_client_id:
             raise HTTPException(status_code=500, detail="OAuth configuration missing")
 
-        # Store OAuth state parameters for callback validation (prevents CSRF)
+        # Store OAuth state parameters for callback validation 
         redis_key_state = f"oauth_state:{state}"
         redis_key_redirect = f"oauth_redirect:{state}"  # original MCP client redirect uri
         redis_key_client = f"oauth_client:{state}"
@@ -203,7 +201,7 @@ async def oauth_callback_for_mcp(
     code: str, state: str, request: Request
 ) -> RedirectResponse:
     """
-    OAuth 2.0 Authorization Response Handler (RFC 6749 Section 4.1.2)
+    OAuth 2.0 Authorization Response Handler
 
     Intermediate callback that receives authorization code from IDP provider
     and redirects back to the original MCP client. This pattern is necessary
@@ -211,7 +209,6 @@ async def oauth_callback_for_mcp(
     have dynamic, tool-specific redirect URIs.
     """
     try:
-        # Validate state parameter to prevent CSRF attacks
         redis_key_state = f"oauth_state:{state}"
         redis_key_redirect = f"oauth_redirect:{state}"
         redis_key_client = f"oauth_client:{state}"
@@ -220,12 +217,11 @@ async def oauth_callback_for_mcp(
         original_redirect_uri = redis_client.get(redis_key_redirect)
         client_id = redis_client.get(redis_key_client)
 
-        # Clean up Redis state immediately (security best practice)
+        # Clean up Redis state immediately 
         redis_client.connection().delete(redis_key_state)
         redis_client.connection().delete(redis_key_redirect)
         redis_client.connection().delete(redis_key_client)
 
-        # Validate state parameter integrity
         if (
             not all([stored_state, original_redirect_uri, client_id])
             or stored_state != state
@@ -243,7 +239,7 @@ async def oauth_callback_for_mcp(
 @mcp_auth_router.post("/token")
 async def oauth_token_endpoint(request: Request) -> Dict[str, Any]:
     """
-    OAuth 2.0 Token Endpoint (RFC 6749 Section 3.2)
+    OAuth 2.0 Token Endpoint 
 
     Exchanges authorization code for access token. This endpoint:
     1. Validates the authorization code with the IDP provider
@@ -254,7 +250,7 @@ async def oauth_token_endpoint(request: Request) -> Dict[str, Any]:
     try:
         body = await request.form()
 
-        # Validate grant type (RFC 6749 Section 4.1.3)
+        # Validate grant type 
         grant_type = body.get("grant_type")
         if grant_type not in ["authorization_code"]:
             raise HTTPException(status_code=400, detail="unsupported_grant_type")
@@ -298,7 +294,7 @@ async def oauth_token_endpoint(request: Request) -> Dict[str, Any]:
             expire_date=expires_at,
         )
 
-        # Return OAuth 2.0 token response (RFC 6749 Section 5.1)
+        # Return OAuth 2.0 token response 
         response = {
             "access_token": access_token,
             "token_type": "Bearer",
@@ -495,7 +491,7 @@ class UserAuthMiddleware(BaseHTTPMiddleware):
             return response
 
         # Get authorization header (supports both formats)
-        authorization = request.headers.get("x-authorization") or request.headers.get("authorization")
+        authorization = request.headers.get("authorization")
 
         # Enforce authentication for MCP API routes
         if request.url.path.startswith("/mcp"):
