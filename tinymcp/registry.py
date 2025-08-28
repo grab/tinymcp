@@ -1,3 +1,8 @@
+"""
+Copyright 2025 Grabtaxi Holdings Pte Ltd (GRAB), All rights reserved.
+Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
+"""
+
 import inspect
 import json
 from typing import Any, Callable, Dict, List, Optional
