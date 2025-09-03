@@ -35,4 +35,4 @@ uv run python docs/sample_server/simple_fastapi_server.py
 
 ## Note on Authentication
 
-Authentication has been intentionally left out of TinyMCP to keep it... tiny. Any auth that can be setup with FastAPI in general can be setup with this. However, for MCP server to interact with most MCP clients like cursor, several specific configurations, endpoints etc. are required. If you have an existing OAuth mechanism in your FastAPI server, it is quite easy to make it work for the TinyMCP server as well. See [oauth_integration_guide.md](./auth_info/oauth_integration_guide.md) for a complete setup guide.
+Authentication has been intentionally left out of TinyMCP to keep it... tiny. Any auth that can be setup with FastAPI in general can be setup with this. However, for MCP server to interact with most MCP clients like cursor, several specific configurations, endpoints etc. are required. If you have an existing OAuth mechanism in your FastAPI server, it is quite easy to make it work for the TinyMCP server as well. See [oauth_integration_guide.md](./docs/authentication/oauth_integration_guide.md) for a complete setup guide.
